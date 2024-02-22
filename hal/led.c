@@ -31,3 +31,13 @@ void setDutyCycle(FILE* cycle, char* newCycle){
     }
     return;
 }
+
+//sets the cycle of the LED
+void setCycle(FILE* cycle, char* newCycle){
+        int result = fprintf(cycle, newCycle);
+    if(result <= 0){
+        printf("ERROR WRITING TO FILE\n");
+        exit(-1);
+    }
+    return;
+}

@@ -9,4 +9,7 @@ void turnOn(FILE* enable);
 void turnOff(FILE* enable);
 
 //sets the duty cycle of the LED
-void setDutyCycle(FILE* cycle, int newCycle);
+void setDutyCycle(FILE* cycle, char* newCycle);
+
+//sets the cycle of the LED
+void setCycle(FILE* cycle, char* newCycle);
