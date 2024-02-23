@@ -2,6 +2,10 @@
 
 #include <cstdio>
 
+#ifndef LED_H
+#define LED_H
+
+
 //enables the LED so it can turn on and off
 void turnOn(FILE* enable);
 
@@ -13,3 +17,5 @@ void setDutyCycle(FILE* cycle, char* newCycle);
 
 //sets the cycle of the LED
 void setCycle(FILE* cycle, char* newCycle);
+
+#endif

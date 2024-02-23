@@ -1,5 +1,8 @@
 //implementation of code used to turn the LED on and off
 
+#ifndef LED_C
+#define LED_C
+
 #include "led.h"
 
 //enables the LED so it can turn on and off
@@ -41,3 +44,5 @@ void setCycle(FILE* cycle, char* newCycle){
     }
     return;
 }
+
+#endif
