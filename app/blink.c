@@ -14,7 +14,7 @@ bool mainBlinkloop(bool isLooping){
     FILE* cycle = fopen("/dev/bone/pwm/1/b/cycle", "w");
 
 
-    while(isLooping){
+    while(isLooping){//isLooping can be changed via main thread when exiting
     
     //get potentiometer here, get into newCycle
 
@@ -30,14 +30,17 @@ bool mainBlinkloop(bool isLooping){
 //uses the led file in the HAL folder to adjust the cycle
 void setCycle(int cycle, FILE* file){
     char cycleChar[sizeof(cycle)*8+1];
-    itoa(cycle, cycleChar, DECIMAL);
+    itoa(cycle, cycleChar, DECIMAL);//converting in
 
-    int inputWritten = fprintf(file, cycleChar);
+    int inputWritten = fprintf(file, cycleChar);//sets the cycle to the char-ized version of cycle
+    if(inputWritten <= 0){
+        printf("SOMETHING IS WRONG\n");
+    }
 }
 
 //turns on the light, allows it to blink
 bool enableLight(void){
-    FILE enableFile = fopen("/dev/bone/pwm/1/b/enable", "w");
+    FILE enableFile = fopen("/dev/bone/pwm/1/b/enable", "w");//file for light enabling
     int inputWritten = fprintf(enableFile, "1");
     if(inputWritten <= 0){return false;}
     fclose(enableFile);
