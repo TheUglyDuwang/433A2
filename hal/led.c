@@ -1,5 +1,8 @@
 //implementation of code used to turn the LED on and off
 
+#ifndef LED_C
+#define LED_C
+
 #include "led.h"
 
 //enables the LED so it can turn on and off
@@ -31,3 +34,15 @@ void setDutyCycle(FILE* cycle, char* newCycle){
     }
     return;
 }
+
+//sets the cycle of the LED
+void setCycle(FILE* cycle, char* newCycle){
+        int result = fprintf(cycle, newCycle);
+    if(result <= 0){
+        printf("ERROR WRITING TO FILE\n");
+        exit(-1);
+    }
+    return;
+}
+
+#endif
