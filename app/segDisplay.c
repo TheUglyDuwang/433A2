@@ -25,8 +25,8 @@ static void showDigit(unsigned char topValue, unsigned char bottomValue, int i2c
 
 void digitLoop(bool cont){
     int i2cFileDesc =  initI2cBus(I2CDRV_LINUX_BUS1, I2C_DEVICE_ADDRESS);
-    unsigned char upperCodes[10] = {0xd0, 0xc0, 2, 0x18, 0x48, 0x58, 0xd8, 0x10, 0xd8, 0x58};
-    unsigned char lowerCodes[10] = {0xe1, 0x00, 2, 0xe3, 0xa2, 0x23, 0x23, 0xa0, 0xe3, 0xe3};
+    unsigned char upperCodes[10] = {0xd0, 0xc0, 0x98, 0x18, 0x48, 0x58, 0xd8, 0x10, 0xd8, 0x58};
+    unsigned char lowerCodes[10] = {0xe1, 0x00, 0xc3, 0xe3, 0xa2, 0x23, 0x23, 0xa0, 0xe3, 0xe3};
     resetDisplay(i2cFileDesc);
     while(cont){
 
@@ -45,5 +45,5 @@ void digitLoop(bool cont){
         //showDigit(rightUpperDigit, rightLowerDigit, i2cFileDesc);
         //turn off right digit
     }
-    
+
 }
