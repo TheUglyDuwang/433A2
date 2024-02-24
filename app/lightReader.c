@@ -5,6 +5,7 @@
 #define HISTORY_SIZE 1000
 #define PACKET_SIZE 1500
 
+int lastCommand = NULL;
 // Define the CircularBuffer struct
 typedef struct {
     double samples[HISTORY_SIZE];
@@ -139,8 +140,32 @@ int lightSamplingCommand(int command) {
             printf("count\n");
             printf("%d\n", totalSamplesTaken);
             break;
-        default:
+        case 5:
+            printf("length\n");
+            printf("%d\n", circularBuffer->size);
             break;
+        case 6:
+            printf("ligthSamplingCommand is like the main function of lightReader:\n");
+            printf("stop -> destroys/frees up sampling (used for clean up)\n");
+            printf("command 1 -> initializes the samlping (used at the start of the program)\n");
+            printf("history -> prints the history for the last 1 second\n");
+            printf("count -> prints the total count of samples\n");
+            printf("length -> prints the number of samples in the last second\n");
+            printf("help -> help function\n");
+            printf("<enter> -> A blank input. Repeats last command. if no last command then error unkown command\n");
+            printf("");
+            break;
+        default:
+            if(lastCommand == NULL){
+                printf("ERROR: unknown command\n");
+            }else{
+                lightSamplingCommand(lastCommand);
+            }
+            break;
+        if(command != NULL){
+            lastCommand = command;
+        }
+        command = lastCommand;
     }
 
     return command;
