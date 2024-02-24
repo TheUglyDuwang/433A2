@@ -11,4 +11,5 @@
 //     command 1 -> initializes the samlping (used at the start of the program)
 //     command 0 -> destroys/frees up sampling (used for clean up)
 //     command 3 -> prints the history for the last 1 second
+//     command 4 -> prints the total count of samples
 int lightSamplingCommand(int command);

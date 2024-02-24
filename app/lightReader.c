@@ -73,15 +73,13 @@ void printHistory(CircularBuffer *buffer){
         }
         printf("\n");
     }
-    index = (lines+1)*10
+    index = (lines+1)*10; // Added missing semicolon
     for(int i = 0; i<remainder; i++ ){ //off chance there are not exactly 10 outputs a line, it will print the last line to the nth input and \n
         printf("%f,", ar[index+i]);
         if(i !=(remainder-1)){
-            prtinf(" ");
+            printf(" ");
         }
     }
-
-    free(ar);
 }
 
 // Function to add a voltage reading to the circular buffer
@@ -96,14 +94,14 @@ void addToHistory(double voltage, int totalSamplesTaken, CircularBuffer *buffer)
 
 // Function to be executed by the sampling thread
 void *lightSamplingThread(void *arg) {
-    CircularBuffer *buffer = (CircularBuffer *)arg; // Cast the argument back to CircularBuffer pointer
-    int totalSamplesTaken = 0;
+    int *totalSamplesTaken = (int *)arg; // Cast the argument back to int pointer
+    CircularBuffer *buffer = createCircularBuffer();
 
     while (true) {
         int value = getVoltage1Reading();
         double voltage = floor(((value / (double)VOLTAGE_MAX) * REFERENCE_VOLTAGE) * 1000) / 1000;
-        addToHistory(voltage, totalSamplesTaken, buffer);
-        totalSamplesTaken++;
+        addToHistory(voltage, *totalSamplesTaken, buffer);
+        (*totalSamplesTaken)++;
         usleep(1000);
     }
     return NULL;
@@ -111,18 +109,19 @@ void *lightSamplingThread(void *arg) {
 
 // Function to start/stop sampling or print history based on command
 int lightSamplingCommand(int command) {
+    static pthread_t sampleLightThread; // Declare the thread variable as static to preserve its value between function calls
+    static CircularBuffer *circularBuffer = NULL; // Initialize to NULL
+    static int totalSamplesTaken = 0;
 
     switch(command) {
         case 1: // Start sampling
             if (circularBuffer == NULL) {
-                static pthread_t sampleLightThread; // Declare the thread variable as static to preserve its value between function calls
-                static CircularBuffer *circularBuffer = NULL; // Initialize to NULL
                 circularBuffer = createCircularBuffer(); // Create circular buffer if not already created
                 if (circularBuffer == NULL) {
                     return -1; // Return -1 to indicate failure
                 }
             }
-            pthread_create(&sampleLightThread, NULL, lightSamplingThread, (void *)circularBuffer);
+            pthread_create(&sampleLightThread, NULL, lightSamplingThread, (void *)&totalSamplesTaken);
             break;
         case 0: // Stop sampling
             if (circularBuffer != NULL) {
@@ -135,6 +134,10 @@ int lightSamplingCommand(int command) {
             if (circularBuffer != NULL) {
                 printHistory(circularBuffer);
             }
+            break;
+        case 4:
+            printf("count\n");
+            printf("%d\n", totalSamplesTaken);
             break;
         default:
             break;
