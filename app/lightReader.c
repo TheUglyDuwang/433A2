@@ -110,6 +110,12 @@ void *lightSamplingThread(void *arg) {
 
 // Function to start/stop sampling or print history based on command
 int lightSamplingCommand(int command) {
+
+    if(command != NULL){//if command isnt null then it updates lastCommand for the default <enter>
+        lastCommand = command;
+    }
+    command = lastCommand;
+
     static pthread_t sampleLightThread; // Declare the thread variable as static to preserve its value between function calls
     static CircularBuffer *circularBuffer = NULL; // Initialize to NULL
     static int totalSamplesTaken = 0;
@@ -136,15 +142,15 @@ int lightSamplingCommand(int command) {
                 printHistory(circularBuffer);
             }
             break;
-        case 4:
+        case 4:// returns total count 
             printf("count\n");
             printf("%d\n", totalSamplesTaken);
             break;
-        case 5:
+        case 5://returns the number of samples taken in the last second
             printf("length\n");
             printf("%d\n", circularBuffer->size);
             break;
-        case 6:
+        case 6://help function
             printf("ligthSamplingCommand is like the main function of lightReader:\n");
             printf("stop -> destroys/frees up sampling (used for clean up)\n");
             printf("command 1 -> initializes the samlping (used at the start of the program)\n");
@@ -155,17 +161,13 @@ int lightSamplingCommand(int command) {
             printf("<enter> -> A blank input. Repeats last command. if no last command then error unkown command\n");
             printf("");
             break;
-        default:
+        default://default to print last command if it exists, if not then error
             if(lastCommand == NULL){
                 printf("ERROR: unknown command\n");
             }else{
                 lightSamplingCommand(lastCommand);
             }
             break;
-        if(command != NULL){
-            lastCommand = command;
-        }
-        command = lastCommand;
     }
 
     return command;
