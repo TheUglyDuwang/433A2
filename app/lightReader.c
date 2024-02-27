@@ -170,5 +170,9 @@ int lightSamplingCommand(int command) {
             break;
     }
 
+<<<<<<< Updated upstream
     return command;
+=======
+    return activate; // Return true when activated
+>>>>>>> Stashed changes
 }
