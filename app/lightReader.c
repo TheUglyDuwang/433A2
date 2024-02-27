@@ -8,9 +8,9 @@
 int lastCommand = NULL;
 // Define the CircularBuffer struct
 typedef struct {
-    double samples[HISTORY_SIZE];
-    int head;
-    int size;
+    _Atomic double samples[HISTORY_SIZE];
+    _Atomic int head;
+    _Atomic int size;
     pthread_mutex_t mutex; // Mutex for thread safety
 } CircularBuffer;
 
@@ -111,7 +111,7 @@ void *lightSamplingThread(void *arg) {
 // Function to start/stop sampling or print history based on command
 int lightSamplingCommand(int command) {
 
-    if(command != NULL){//if command isnt null then it updates lastCommand for the default <enter>
+    if(command != NULL){//if command isn't null then it updates lastCommand for the default <enter>
         lastCommand = command;
     }
     command = lastCommand;
@@ -170,9 +170,5 @@ int lightSamplingCommand(int command) {
             break;
     }
 
-<<<<<<< Updated upstream
     return command;
-=======
-    return activate; // Return true when activated
->>>>>>> Stashed changes
 }
