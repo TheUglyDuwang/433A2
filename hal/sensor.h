@@ -3,5 +3,5 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-//get voltagereading
+//get voltage reading
 int getVoltage1Reading();

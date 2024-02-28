@@ -1,4 +1,5 @@
 #include "lightReader.h"
+#include "sensor.h"
 
 #define VOLTAGE_MAX 4095
 #define REFERENCE_VOLTAGE 1.8
@@ -34,8 +35,6 @@ void destroyCircularBuffer(CircularBuffer *buffer){
     pthread_mutex_destroy(&buffer->mutex);
     free(buffer);
 }
-
-extern int getVoltage1Reading(); // Declaration of external function
 
 // Function to print the history stored in the circular buffer
 void printHistory(CircularBuffer *buffer){
