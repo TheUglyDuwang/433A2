@@ -7,17 +7,17 @@
 #include <stdlib.h> 
 
 
-void Sampler_init(void);
-void Sampler_cleanup(void);
+void Sampler_init(void);//
+void Sampler_cleanup(void);//
 
-void Sampler_moveCurrentDataToHistory(void);
+void Sampler_moveCurrentDataToHistory(void);//
 
-int Sampler_getHistorySize(void);
+int Sampler_getHistorySize(void);//
 
-double* Sampler_getHistory(int *size);
+double* Sampler_getHistory(int *size);//
 
-double Sampler_getAverageReading(void);
+double Sampler_getAverageReading(void);//
 
-long long Sampler_getNumSamplesTaken(void);
+long long Sampler_getNumSamplesTaken(void);//
 
 

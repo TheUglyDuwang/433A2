@@ -79,3 +79,44 @@ void Sampler_cleanup(void){
 long long Sampler_getNumSamplesTaken(void){
     return samplesTaken;
 }
+
+double Sampler_getAverageReading(void){
+    double avg = 0;
+    for(int i = 0; i < history.size; i++){
+        avg = avg + history.sample[i];
+    }
+    avg = avg / history.size;
+    return floor( avg *1000)/ 1000;
+}
+
+int Sampler_getHistorySize(void){
+    return history.size;
+}
+
+double* Sampler_getHistory(int *size){
+    if(history.size = size){
+        return history.sample;
+    }
+    else{
+        perror("issue getting history");
+        return 0.00;
+    }
+}
+
+int Sampler_getDips( void ){
+    double avg = Sampler_getAverageReading();
+    int dips = 0;
+    int canCountDip = 1;
+    int size = Sampler_getHistorySize();
+
+    for(int i = 0; i < size; i++){
+        if ( (avg - ar[i] ) < 0.1 && canCountDip){
+            dips++;
+            canCountDip = 0;
+        } else if ( (avg - ar[i] ) >= 0.07 && !canCountDip ) {
+            canCountDip = 1;
+        }
+    }
+
+    return dips;
+}
