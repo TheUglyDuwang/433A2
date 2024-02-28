@@ -7,13 +7,17 @@
 #include <stdlib.h> 
 
 
-// ligthSamplingCommand is like the main function of lightReader:
-//     command 1 -> initializes the samlping (used at the start of the program)
-//     command 0 -> destroys/frees up sampling (used for clean up)
-//     command 3 -> prints the history for the last 1 second
-//     command 4 -> prints the total count of samples
-//     command 5 -> prints the number of samples in the last second
-//     command 6 -> help function
-//     command 7 -> dip //not implemented
+void Sampler_init(void);
+void Sampler_cleanup(void);
 
-int lightSamplingCommand(int command);
+void Sampler_moveCurrentDataToHistory(void);
+
+int Sampler_getHistorySize(void);
+
+double* Sampler_getHistory(int *size);
+
+double Sampler_getAverageReading(void);
+
+long long Sampler_getNumSamplesTaken(void);
+
+

@@ -6,17 +6,28 @@
 			[
 				{
 					"build" : ".",
-					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
-					"minimumCMakeVersion" : 
-					{
-						"string" : "3.18"
-					},
-					"projectIndex" : 0,
-					"source" : ".",
-					"targetIndexes" : 
+					"childIndexes" : 
 					[
-						0
-					]
+						1,
+						2
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "hal",
+					"jsonFile" : "directory-hal-Debug-b0ca0e3cac237c9cce65.json",
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "hal"
+				},
+				{
+					"build" : "app",
+					"jsonFile" : "directory-app-Debug-94c5f210ca04b1028ae5.json",
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "app"
 				}
 			],
 			"name" : "Debug",
@@ -25,25 +36,14 @@
 				{
 					"directoryIndexes" : 
 					[
-						0
+						0,
+						1,
+						2
 					],
-					"name" : "Sampler",
-					"targetIndexes" : 
-					[
-						0
-					]
+					"name" : "Project"
 				}
 			],
-			"targets" : 
-			[
-				{
-					"directoryIndex" : 0,
-					"id" : "as2::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-as2-Debug-91da05a03f2558263355.json",
-					"name" : "as2",
-					"projectIndex" : 0
-				}
-			]
+			"targets" : []
 		}
 	],
 	"kind" : "codemodel",

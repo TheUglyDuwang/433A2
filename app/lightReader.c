@@ -1,173 +1,81 @@
 #include "lightReader.h"
 #include "sensor.h"
+#include <pthread.h>
+#include <math.h> // for floor function
 
 #define VOLTAGE_MAX 4095
 #define REFERENCE_VOLTAGE 1.8
-#define HISTORY_SIZE 1000
 #define PACKET_SIZE 1500
+#define PORT 12345
 
-int lastCommand = NULL;
-// Define the CircularBuffer struct
-typedef struct {
-    _Atomic double samples[HISTORY_SIZE];
-    _Atomic int head;
-    _Atomic int size;
-    pthread_mutex_t mutex; // Mutex for thread safety
-} CircularBuffer;
+typedef struct sampler {
+    int size;
+    double samples[1000]; // array to store samples
+} sampler;
 
-// Function to create a CircularBuffer
-CircularBuffer *createCircularBuffer(){
-    CircularBuffer *buffer = (CircularBuffer *)malloc(sizeof(CircularBuffer));
-    if(buffer == NULL){ // Correct the comparison operator here
-        return NULL;
-    }
-    buffer->head = 0;
-    buffer->size = 0;
-    if(pthread_mutex_init(&buffer->mutex, NULL) != 0){
-        free(buffer); // Free memory if mutex initialization fails
-        return NULL;
-    }
-    return buffer;
+static int isInit;
+static int sampling;
+static pthread_t thread_id;
+static long long samplesTaken;
+static sampler reader; // declare reader as a global variable
+static sampler history;
+static history[1000];
+static long long totalVoltage;
+
+static long long getTimeInMs(void){
+    struct timespec spec;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    long long seconds = spec.tv_sec;
+    long long nanoSeconds = spec.tv_nsec;
+    long long milliSeconds = seconds * 1000 + nanoSeconds / 1000000;
+    return milliSeconds;
 }
 
-// Function to destroy a CircularBuffer
-void destroyCircularBuffer(CircularBuffer *buffer){
-    pthread_mutex_destroy(&buffer->mutex);
-    free(buffer);
+void Sampler_moveCurrentDataToHistory(void){
+    history.size = reader.size;
+    copyArray(reader.samples, history.samples, history.size);
+    reader.size = 0;
+    return;
 }
 
-// Function to print the history stored in the circular buffer
-void printHistory(CircularBuffer *buffer){
-    int size = buffer -> size;
-    int head = buffer->head + 1;
-    int index = 0;
-    int remainder = 0;
-    int lines = 0;
-
-    double ar[size];
-
-    for(int i = head ; i < size; i ++){
-        ar[index] = buffer ->samples[i];
-        index++;
-    }
-
-    for(int i = 0; i< head; i++ ){
-        ar[index] = buffer->samples[i];
-        index++;
-    }
-
-    if(size % 10 != 0){
-        remainder = size % 10;
-        size = size - remainder;
-    }
-
-    lines = size / 10;
-
-    for(int i = 0; i < lines; i ++){ //prints outputs and then \n without having white space for the 10th number in the line
-        index = i*10;
-        for(int k = 0; k < 10; k++){
-            printf("%f,", ar[index+k]);
-            if(k != 9){
-                printf(" ");
-            }
+void *Sampler_thread(void* arg){
+    int prevTime = getTimeInMs();
+    int curTime = getTimeInMs();
+    while(isInit){
+        if( (curTime - prevTime) > 1000 ){
+            Sampler_moveCurrentDataToHistory();
+            prevTime = getTimeInMs();
         }
-        printf("\n");
-    }
-    index = (lines+1)*10; // Added missing semicolon
-    for(int i = 0; i<remainder; i++ ){ //off chance there are not exactly 10 outputs a line, it will print the last line to the nth input and \n
-        printf("%f,", ar[index+i]);
-        if(i !=(remainder-1)){
-            printf(" ");
-        }
-    }
-}
-
-// Function to add a voltage reading to the circular buffer
-void addToHistory(double voltage, int totalSamplesTaken, CircularBuffer *buffer) {
-    pthread_mutex_lock(&buffer->mutex); // Lock mutex before accessing buffer
-    int index = totalSamplesTaken % HISTORY_SIZE;
-    buffer->samples[index] = voltage;
-    buffer->head = index;
-    buffer->size++;
-    pthread_mutex_unlock(&buffer->mutex); // Unlock mutex after accessing buffer
-}
-
-// Function to be executed by the sampling thread
-void *lightSamplingThread(void *arg) {
-    int *totalSamplesTaken = (int *)arg; // Cast the argument back to int pointer
-    CircularBuffer *buffer = createCircularBuffer();
-
-    while (true) {
         int value = getVoltage1Reading();
         double voltage = floor(((value / (double)VOLTAGE_MAX) * REFERENCE_VOLTAGE) * 1000) / 1000;
-        addToHistory(voltage, *totalSamplesTaken, buffer);
-        (*totalSamplesTaken)++;
-        usleep(1000);
+        reader.samples[reader.size++] = voltage;
+        samplesTaken++;
+        curTime = getTimeInMs();
+        usleep(1000); // sleep for 1 millisecond
     }
     return NULL;
 }
 
-// Function to start/stop sampling or print history based on command
-int lightSamplingCommand(int command) {
-
-    if(command != NULL){//if command isn't null then it updates lastCommand for the default <enter>
-        lastCommand = command;
+void Sampler_init(void){
+    isInit = 1;
+    samplesTaken = 0;
+    reader.size = 0;
+    history.size = 0;
+    totalVoltage = 0;
+    if (pthread_create(&thread_id, NULL, Sampler_thread, NULL) != 0) {
+        perror("pthread_create");
+        return;
     }
-    command = lastCommand;
+}
 
-    static pthread_t sampleLightThread; // Declare the thread variable as static to preserve its value between function calls
-    static CircularBuffer *circularBuffer = NULL; // Initialize to NULL
-    static int totalSamplesTaken = 0;
-
-    switch(command) {
-        case 1: // Start sampling
-            if (circularBuffer == NULL) {
-                circularBuffer = createCircularBuffer(); // Create circular buffer if not already created
-                if (circularBuffer == NULL) {
-                    return -1; // Return -1 to indicate failure
-                }
-            }
-            pthread_create(&sampleLightThread, NULL, lightSamplingThread, (void *)&totalSamplesTaken);
-            break;
-        case 0: // Stop sampling
-            if (circularBuffer != NULL) {
-                pthread_join(sampleLightThread, NULL);
-                destroyCircularBuffer(circularBuffer);
-                circularBuffer = NULL; // Set to NULL after destroying to indicate buffer is no longer valid
-            }
-            break;
-        case 3: // Print history
-            if (circularBuffer != NULL) {
-                printHistory(circularBuffer);
-            }
-            break;
-        case 4:// returns total count 
-            printf("count\n");
-            printf("%d\n", totalSamplesTaken);
-            break;
-        case 5://returns the number of samples taken in the last second
-            printf("length\n");
-            printf("%d\n", circularBuffer->size);
-            break;
-        case 6://help function
-            printf("ligthSamplingCommand is like the main function of lightReader:\n");
-            printf("stop -> destroys/frees up sampling (used for clean up)\n");
-            printf("command 1 -> initializes the samlping (used at the start of the program)\n");
-            printf("history -> prints the history for the last 1 second\n");
-            printf("count -> prints the total count of samples\n");
-            printf("length -> prints the number of samples in the last second\n");
-            printf("help -> help function\n");
-            printf("<enter> -> A blank input. Repeats last command. if no last command then error unkown command\n");
-            printf("");
-            break;
-        default://default to print last command if it exists, if not then error
-            if(lastCommand == NULL){
-                printf("ERROR: unknown command\n");
-            }else{
-                lightSamplingCommand(lastCommand);
-            }
-            break;
+void Sampler_cleanup(void){
+    isInit = 0;
+    if (pthread_join(thread_id, NULL) != 0) {
+        perror("pthread_join");
+        return;
     }
+}
 
-    return command;
+long long Sampler_getNumSamplesTaken(void){
+    return samplesTaken;
 }
