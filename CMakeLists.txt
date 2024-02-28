@@ -23,7 +23,7 @@ set(SOURCES
 # Define header files
 set(HEADERS
     app/blink.h
-    app/lightreader.h
+    app/lightReader.h
     app/main.h
     hal/led.h
     hal/sensor.h

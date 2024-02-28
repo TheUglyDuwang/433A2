@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/home/tegnoor/cmpt433/work/433A2/build",
+  "command": "/usr/bin/arm-linux-gnueabihf-gcc   -g -std=gnu11 -g -Wall -Werror -Wpedantic -Wextra -D_POSIX_C_SOURCE=200809L -o CMakeFiles/as2.dir/app/blink.c.o -c /home/tegnoor/cmpt433/work/433A2/app/blink.c",
+  "file": "/home/tegnoor/cmpt433/work/433A2/app/blink.c",
+  "output": "CMakeFiles/as2.dir/app/blink.c.o"
+},
+{
+  "directory": "/home/tegnoor/cmpt433/work/433A2/build",
+  "command": "/usr/bin/arm-linux-gnueabihf-gcc   -g -std=gnu11 -g -Wall -Werror -Wpedantic -Wextra -D_POSIX_C_SOURCE=200809L -o CMakeFiles/as2.dir/app/lightReader.c.o -c /home/tegnoor/cmpt433/work/433A2/app/lightReader.c",
+  "file": "/home/tegnoor/cmpt433/work/433A2/app/lightReader.c",
+  "output": "CMakeFiles/as2.dir/app/lightReader.c.o"
+},
+{
+  "directory": "/home/tegnoor/cmpt433/work/433A2/build",
+  "command": "/usr/bin/arm-linux-gnueabihf-gcc   -g -std=gnu11 -g -Wall -Werror -Wpedantic -Wextra -D_POSIX_C_SOURCE=200809L -o CMakeFiles/as2.dir/app/main.c.o -c /home/tegnoor/cmpt433/work/433A2/app/main.c",
+  "file": "/home/tegnoor/cmpt433/work/433A2/app/main.c",
+  "output": "CMakeFiles/as2.dir/app/main.c.o"
+},
+{
+  "directory": "/home/tegnoor/cmpt433/work/433A2/build",
+  "command": "/usr/bin/arm-linux-gnueabihf-gcc   -g -std=gnu11 -g -Wall -Werror -Wpedantic -Wextra -D_POSIX_C_SOURCE=200809L -o CMakeFiles/as2.dir/hal/led.c.o -c /home/tegnoor/cmpt433/work/433A2/hal/led.c",
+  "file": "/home/tegnoor/cmpt433/work/433A2/hal/led.c",
+  "output": "CMakeFiles/as2.dir/hal/led.c.o"
+},
+{
+  "directory": "/home/tegnoor/cmpt433/work/433A2/build",
+  "command": "/usr/bin/arm-linux-gnueabihf-gcc   -g -std=gnu11 -g -Wall -Werror -Wpedantic -Wextra -D_POSIX_C_SOURCE=200809L -o CMakeFiles/as2.dir/hal/sensor.c.o -c /home/tegnoor/cmpt433/work/433A2/hal/sensor.c",
+  "file": "/home/tegnoor/cmpt433/work/433A2/hal/sensor.c",
+  "output": "CMakeFiles/as2.dir/hal/sensor.c.o"
+}
+]

@@ -1,0 +1,3 @@
+/home/tegnoor/cmpt433/work/433A2/build/CMakeFiles/as2.dir
+/home/tegnoor/cmpt433/work/433A2/build/CMakeFiles/edit_cache.dir
+/home/tegnoor/cmpt433/work/433A2/build/CMakeFiles/rebuild_cache.dir
