@@ -16,7 +16,7 @@
 #define LEFT_DIGIT_FILE_PATH "/sys/class/gpio/gpio61/value"
 #define RIGHT_DIGIT_FILE_PATH "/sys/class/gpio/gpio44/value"
 
-_Atomic int numOfBlinks;
+static _Atomic int numOfBlinks;
 
 void setBlinkNum(int newNum){
     numOfBlinks = newNum;
