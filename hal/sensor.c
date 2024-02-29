@@ -1,9 +1,6 @@
 //implementation file for functions pertaining to the light sensor
 #include "sensor.h"
 
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdio.h>
 #define A2D_FILE_VOLTAGE1 "/sys/bus/iio/devices/iio:device0/in_voltage1_raw"
 
 

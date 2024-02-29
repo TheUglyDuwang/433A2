@@ -1,0 +1,1 @@
+/usr/bin/arm-linux-gnueabihf-gcc -g CMakeFiles/as2.dir/app/blink.c.o CMakeFiles/as2.dir/app/lightReader.c.o CMakeFiles/as2.dir/app/main.c.o CMakeFiles/as2.dir/hal/led.c.o CMakeFiles/as2.dir/hal/sensor.c.o -o as2 
