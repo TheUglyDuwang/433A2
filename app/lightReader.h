@@ -20,4 +20,10 @@ double Sampler_getAverageReading(void);//
 
 long long Sampler_getNumSamplesTaken(void);//
 
+int Sampler_getDips( void );//
+
+void terminal_OutputLine1(void);
+
+void terminal_OutputLine2(void);
+
 

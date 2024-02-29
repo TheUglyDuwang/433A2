@@ -13,6 +13,8 @@
 typedef struct sampler {
     int size;
     double samples[1000]; // array to store samples
+    double min;
+    double max;
 } sampler;
 
 static int isInit;
@@ -29,46 +31,22 @@ static long long totalVoltage;
 void Sampler_moveCurrentDataToHistory(void){
     history.size = reader.size;
     copyArray(reader.samples, history.samples, history.size);
+    history.min = reader.min;
+    history.max = reader.max;
+    reader.min = 1000;
+    reader.max = 0;
     reader.size = 0;
     return;
 }
 
-void *Sampler_thread(void* arg){
-    int prevTime = getTimeInMs();
-    int curTime = getTimeInMs();
-    while(isInit){
-        if( (curTime - prevTime) > 1000 ){
-            Sampler_moveCurrentDataToHistory();
-            prevTime = getTimeInMs();
-        }
-        int value = getVoltage1Reading();
-        double voltage = floor(((value / (double)VOLTAGE_MAX) * REFERENCE_VOLTAGE) * 1000) / 1000;
-        reader.samples[reader.size++] = voltage;
-        samplesTaken++;
-        curTime = getTimeInMs();
-        usleep(1000); // sleep for 1 millisecond
-    }
-    return NULL;
-}
-
-void Sampler_init(void){
-    isInit = 1;
-    samplesTaken = 0;
-    reader.size = 0;
-    history.size = 0;
-    totalVoltage = 0;
-    if (pthread_create(&thread_id, NULL, Sampler_thread, NULL) != 0) {
-        perror("pthread_create");
-        return;
-    }
-}
-
-void Sampler_cleanup(void){
-    isInit = 0;
-    if (pthread_join(thread_id, NULL) != 0) {
-        perror("pthread_join");
-        return;
-    }
+static long long getTimeInMs(void)
+{
+    struct timespec spec;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    long long seconds = spec.tv_sec;
+    long long nanoSeconds = spec.tv_nsec;
+    long long milliSeconds = seconds * 1000 + nanoSeconds / 1000000;
+    return milliSeconds;
 }
 
 long long Sampler_getNumSamplesTaken(void){
@@ -114,4 +92,75 @@ int Sampler_getDips( void ){
     }
 
     return dips;
+}
+
+void terminal_OutputLine1( void ){
+    printf("Smpl ms[%d, %d] %f / %d",history.min, history.max, Sampler_getAverageReading(void), history.size );
+    return;
+}
+void terminal_OutputLine2( void ){
+    if(history.size < 20){
+        for (int i = 0; i < history.size; i++){
+            printf("%d : %f\n", i+1, history.sample[i]);
+        }
+    } else{
+        int count = floor( sample.size);
+        for (int i = 0; i < history.size; i = i + count){
+            printf("%d : %f\n", i+1, history.sample[i]);
+        }
+    }
+    return;
+}
+
+void *Sampler_thread(void* arg){
+    int prevTime = getTimeInMs();
+    int curTime = getTimeInMs();
+    int prevTimePerSample;
+    int curTimePerSample;
+    int timeBetweenSamples;
+    reader.min = 1000;
+    while(isInit){
+        prevTimePerSample = getTimeInMs();
+        if( (curTime - prevTime) > 1000 ){
+            Sampler_moveCurrentDataToHistory();
+            prevTime = getTimeInMs();
+            terminal_OutputLine1();
+            terminal_OutputLine2();
+        }
+        int value = getVoltage1Reading();
+        double voltage = floor(((value / (double)VOLTAGE_MAX) * REFERENCE_VOLTAGE) * 1000) / 1000;
+        reader.samples[reader.size++] = voltage;
+        samplesTaken++;
+        curTime = getTimeInMs();
+        curTimePerSample = getTimeInMs();
+        timeBetweenSamples = curTimePerSample - prevTimePerSample;
+        if(timeBetweenSamples < reader.min){
+            reader.min = timeBetweenSamples;
+        }
+        if(timeBetweenSamples > reader.max){
+            reader.max = timeBetweenSamples;
+        }
+        usleep(1000); // sleep for 1 millisecond
+    }
+    return NULL;
+}
+
+void Sampler_init(void){
+    isInit = 1;
+    samplesTaken = 0;
+    reader.size = 0;
+    history.size = 0;
+    totalVoltage = 0;
+    if (pthread_create(&thread_id, NULL, Sampler_thread, NULL) != 0) {
+        perror("pthread_create");
+        return;
+    }
+}
+
+void Sampler_cleanup(void){
+    isInit = 0;
+    if (pthread_join(thread_id, NULL) != 0) {
+        perror("pthread_join");
+        return;
+    }
 }
