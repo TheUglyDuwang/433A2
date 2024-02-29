@@ -1,6 +1,9 @@
 #ifndef SEG_DISPLAY_H
 #define SEG_DISPLAY_H
 
+//sets the atomic blink number to 
+void setBlinkNum(int newNum);
+
 //resets the display
 static void resetDisplay(int i2cFileDesc);
 

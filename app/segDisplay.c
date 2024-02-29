@@ -16,6 +16,12 @@
 #define LEFT_DIGIT_FILE_PATH "/sys/class/gpio/gpio61/value"
 #define RIGHT_DIGIT_FILE_PATH "/sys/class/gpio/gpio44/value"
 
+_Atomic int numOfBlinks;
+
+void setBlinkNum(int newNum){
+    numOfBlinks = newNum;
+}
+
 static void resetDisplay(int i2cFileDesc){
     writeI2cReg(i2cFileDesc, REG_DIRA, 0x00);
     writeI2cReg(i2cFileDesc, REG_DIRB, 0x00);
@@ -36,8 +42,6 @@ void digitThread(void){
     pthread_mutex_init(&buffer->mutex, NULL);
 
 }
-
-_Atomic int numOfBlinks;
 
 static void flipDigit(char* filePath, int onOff){
     FILE* digit = fopen(filePath, "w");
