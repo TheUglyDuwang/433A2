@@ -4,6 +4,9 @@
 //sets the atomic blink number to 
 void setBlinkNum(int newNum);
 
+//runs a command, given by prof
+static void runCommand(char* command);
+
 //resets the display
 static void resetDisplay(int i2cFileDesc);
 

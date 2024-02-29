@@ -22,6 +22,26 @@ void setBlinkNum(int newNum){
     numOfBlinks = newNum;
 }
 
+//provided by prof
+static void runCommand(char* command){
+ // Execute the shell command (output into pipe)
+    FILE *pipe = popen(command, "r");
+ // Ignore output of the command; but consume it
+ // so we don't get an error when closing the pipe.
+ char buffer[1024];
+    while (!feof(pipe) && !ferror(pipe)) {
+        if (fgets(buffer, sizeof(buffer), pipe) == NULL)
+            break;
+ // printf("--> %s", buffer); // Uncomment for debugging
+    }
+ // Get the exit code from the pipe; non-zero is an error:
+    int exitCode = WEXITSTATUS(pclose(pipe));
+    if (exitCode != 0) {
+        runCommand(command);//since this will only be used to initialize the i2c pins, it should only call an error if they were already exported
+                            //which would unexport them, so they need to be exported again
+    }
+}
+
 static void resetDisplay(int i2cFileDesc){
     writeI2cReg(i2cFileDesc, REG_DIRA, 0x00);
     writeI2cReg(i2cFileDesc, REG_DIRB, 0x00);
@@ -60,6 +80,8 @@ static void sleepForMs(long long delayInMs){
 }
 
 void digitLoop(void){
+    runCommand("config-pin P9_18 i2c");
+    runCommand("config-pin P9_17 i2c");
     numOfBlinks = 0;
     int i2cFileDesc =  initI2cBus(I2CDRV_LINUX_BUS1, I2C_DEVICE_ADDRESS);
     unsigned char upperCodes[10] = {0xe1, 0x00, 0xc3, 0x01, 0x62, 0x63, 0xa3, 0x01, 0xe3, 0x63}; //register 0x01
