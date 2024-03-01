@@ -7,12 +7,21 @@
 #include "led.h"
 #include "potentiometer.h"
 #include <stdatomic.h>
+#include <pthread.h>
 
 
 static _Atomic bool isLooping;
+static pthread_t thread_id;
+
+void lightThread(void){
+    if (pthread_create(&thread_id, NULL, mainBlinkloop, NULL) != 0) {
+        perror("pthread_create");
+        return;
+    }
+}
 
 //main loop for blinking
-bool mainBlinkloop(void){
+void mainBlinkloop(void){
     enableLight();
     isLooping = true;
     int newCycle = 0; //this will store the new cycle
@@ -23,14 +32,14 @@ bool mainBlinkloop(void){
     
         newCycle = getVoltage0Reading();
         cycle = fopen("/dev/bone/pwm/0/b/period", "w");
-        BLINK_C.setCycle(cycle, newCycle);
+        LED_H.setCycle(cycle, newCycle);
         fclose(cycle);
 
     }
 
     disableLight();
 
-    return true;
+    
 }
 
 //turns on the light, allows it to blink

@@ -18,6 +18,7 @@ void help(void) {
     printf("stop: Exit the program.\n");
     printf("<enter>: Runs the last command.\n");
 }
+
 void history(void) {
     int size = 0;
     double *samples = Sampler_getHistory(&size);
@@ -38,7 +39,8 @@ void history(void) {
 
 int main(void) {
     Sampler_init();
-    
+    lightThread();
+    startDisplay();
     char command[20];
     char previous_command[20] = "";
     while (1) {
@@ -70,6 +72,9 @@ int main(void) {
             history();
         } else if (strcmp(command, "stop") == 0) {
             Sampler_cleanup();
+            stopLooping();
+            closeClient();
+            closeServer();
         } else if (strcmp(command, "") == 0) {
             printf("Unknown command: %s\n", command);
         }

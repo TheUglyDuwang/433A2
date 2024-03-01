@@ -1,6 +1,7 @@
 #include "./hal/digitDisplay.c"
 #include "segDisplay.h"
 #include <stdatomic.h>
+#include "lightReader.h"
 
 #define I2CDRV_LINUX_BUS0 "/dev/i2c-0"
 #define I2CDRV_LINUX_BUS1 "/dev/i2c-1"
@@ -17,8 +18,30 @@
 #define RIGHT_DIGIT_FILE_PATH "/sys/class/gpio/gpio44/value"
 
 static _Atomic int numOfBlinks;
+static pthread_t thread_id;
+static pthread_t thread2;
 
-void setBlinkNum(int newNum){
+void startDisplay(void){
+    if (pthread_create(&thread_id, NULL, digitLoop, NULL) != 0) {
+        perror("pthread_create");
+        return;
+    }
+    startDips();
+}
+
+void startDips(void){
+    if (pthread_create(&thread2, NULL, diploop, NULL) != 0) {
+        perror("pthread_create");
+        return;
+    }
+}
+
+void diploop(void){
+    setBlinkNum(Sampler_getDips());
+    sleep(1);
+}
+
+static void setBlinkNum(int newNum){
     numOfBlinks = newNum;
 }
 
@@ -56,11 +79,8 @@ static void showDigit(unsigned char topValue, unsigned char bottomValue, int i2c
 
 void digitThread(void){
     static pthread_t digitThread;
-    static int buffer = 0;
 
-    pthread_create(&digitThread, NULL, digitLoop, (void *)&buffer);
-    pthread_mutex_init(&buffer->mutex, NULL);
-
+    pthread_create(&digitThread, NULL, digitLoop, NULL);
 }
 
 static void flipDigit(char* filePath, int onOff){
@@ -87,7 +107,6 @@ void digitLoop(void){
     unsigned char upperCodes[10] = {0xe1, 0x00, 0xc3, 0x01, 0x62, 0x63, 0xa3, 0x01, 0xe3, 0x63}; //register 0x01
     unsigned char lowerCodes[10] = {0xd0, 0xc0, 0x98, 0xd8, 0xc8, 0x58, 0x58, 0xc0, 0xd8, 0xd8}; //register 0x00
     bool cont = true;
-    int buffRead = 0;
     unsigned char leftLowerDigit;
     unsigned char leftUpperDigit;
     unsigned char rightUpperDigit;
@@ -97,7 +116,7 @@ void digitLoop(void){
         
         int left = numOfBlinks/10;
         int right = numOfBlinks%10;
-        if(buffRead == -1){//exit condition
+        if(numOfBlinks == -1){//exit condition
             cont = false;
         }else{
             leftUpperDigit = upperCodes[left];
