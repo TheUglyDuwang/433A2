@@ -2,11 +2,16 @@
 #include "sensor.h"
 #include "periodTimer.h"
 
+#include <pthread.h>
+#include <math.h> // for floor function
+#include <stdio.h> // for printf
+#include <stdlib.h> // for NULL
+#include <time.h> // for clock_gettime
+#include <unistd.h> // for usleep
 
 #define VOLTAGE_MAX 4095
 #define REFERENCE_VOLTAGE 1.8
-#define PACKET_SIZE 1500
-#define PORT 12345
+
 
 typedef struct sampler {
     int size;
