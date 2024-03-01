@@ -5,6 +5,7 @@
         "pthread.h": "c",
         "unistd.h": "c",
         "stdio.h": "c",
-        "limits": "c"
+        "limits": "c",
+        "time.h": "c"
     }
 }
