@@ -37,6 +37,8 @@ void history(void) {
 }
 
 int main(void) {
+    Sampler_init();
+    
     char command[20];
     char previous_command[20] = "";
     while (1) {
