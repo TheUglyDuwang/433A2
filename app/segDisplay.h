@@ -1,8 +1,12 @@
 #ifndef SEG_DISPLAY_H
 #define SEG_DISPLAY_H
 
-//sets the atomic blink number to 
-void setBlinkNum(int newNum);
+
+void startDisplay(void);
+
+void startDips(void);
+
+void diploop(void);
 
 //runs a command, given by prof
 static void runCommand(char* command);

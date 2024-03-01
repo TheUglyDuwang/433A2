@@ -3,8 +3,10 @@
 #define BLINK_H
 #include <cstdio>
 
+void lightThread(void);
+
 //main loop for blinking
-bool mainBlinkloop(void);
+void mainBlinkloop(void);
 
 //turns on the light, allows it to blink
 bool enableLight(void);
